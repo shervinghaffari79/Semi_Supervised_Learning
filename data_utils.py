@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split
 from PIL import Image
 import kagglehub
 from typing import Tuple, Optional
+import copy
 
 from config import DataConfig
 
@@ -26,6 +27,7 @@ class CIFAR10CSVDataset(Dataset):
             csv_file: Path to the CSV file with CIFAR-10 data
             transform: Optional transform to be applied on samples
         """
+        self.csv_file = csv_file
         self.data_frame = pd.read_csv(csv_file)
         self.transform = transform
         
@@ -149,13 +151,9 @@ class DataManager:
         self.unlabeled_dataset = Subset(self.train_dataset, unlabeled_indices)
         self.val_dataset = Subset(self.train_dataset, val_indices)
         
-        # Apply test transform to validation dataset
+        # Apply test transform to validation dataset without affecting training data
         if hasattr(self.val_dataset.dataset, 'transform'):
-            # Create a copy of the dataset with test transform for validation
-            val_dataset_copy = type(self.train_dataset)(
-                **{k: v for k, v in self.train_dataset.__dict__.items() 
-                   if k != 'transform'}
-            )
+            val_dataset_copy = copy.deepcopy(self.train_dataset)
             val_dataset_copy.transform = self.config.get_test_transform()
             self.val_dataset = Subset(val_dataset_copy, val_indices)
         

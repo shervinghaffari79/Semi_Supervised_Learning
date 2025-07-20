@@ -164,7 +164,7 @@ class ExperimentConfig:
         assert self.data.labeled_size > 0, "Labeled size must be positive"
         assert self.data.validation_size > 0, "Validation size must be positive"
         assert self.model.num_classes > 0, "Number of classes must be positive"
-        assert self.training.autoencoder_epochs > 0, "Autoencoder epochs must be positive"
+        assert self.training.autoencoder_epochs >= 0, "Autoencoder epochs must be non-negative"
         assert self.training.classifier_epochs > 0, "Classifier epochs must be positive"
         
         if self.model.unfreeze_after_epoch >= self.training.classifier_epochs:
